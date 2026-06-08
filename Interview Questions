@@ -1,0 +1,91 @@
+1.  What is Spark?
+Apache Spark is a distributed data processing engine that uses DAG-based execution, in-memory computation, and parallel processing to efficiently handle large-scale data workloads.
+or
+Spark is a super-fast cluster computing technology. It is a distributed data processing engine that can be used to solve a variety of complex problems and perform highly complex computations
+
+2. What are the Feature of spark?
+  a.	Speed          -->   Spark runs up to 100 times faster than Hadoop MapReduce for large-scale data processing. It is also able to achieve this speed through controlled partitioning.
+  b.	Powerful Caching   -->   Simple programming layer provides powerful caching and disk persistence capabilities.
+  c.    Deployment     -->   It can be deployed through Mesos, Hadoop via YARN, or Spark’s own cluster manager.
+  d.    Real-Time      -->   It offers Real-time computation & low latency because of in-memory computation.
+  e.    Polyglot     -->    Spark provides high-level APIs in Java, Scala, Python, and R. Spark code can be written in any of these four languages. It also provides a shell in Scala and Python.
+
+3. Name the components in the Spark ecosystem ? 
+ The components in the Spark ecosystem are: 
+    ⇒ Spark Streaming – It is responsible for processing the real-time streaming data.
+    ⇒ GraphX – It implements graphs and parallel computations on the graphs.
+    ⇒ Spark SQL – It is responsible for integrating Spark’s functional programming API with relational database processing. 
+    ⇒ MLib – This is the library used for machine learning.
+    ⇒ Spark Core – It is a distributed execution engine that can perform large-scale parallel and distributed data processing.
+
+4. what is RDD?
+ Resilient Distributed Dataset   stands for 
+
+	Resilient: It’s fault-tolerant and can build data in case of a any node failure
+
+	Distributed: The data is distributed among multiple nodes in a cluster
+
+	Dataset: Data is partitioned based on values
+
+ RDD is immutable, meaning that it cannot be modified once created, but it can be transformed at any time. Every Dataset in RDD is divided into multiple logical partitions, and this distribution is done by Spark.
+ An RDD can be created from existing data in your program or from external storage like HDFS/ ADLS. It supports two types of operations: transformations and actions
+
+5. what is Transformations?
+  RDD transformations are lazy operations that create a new RDD from an existing one, such as map and filter.
+
+
+6. What are Narrow and Wide Transformations?
+  Narrow transformation: A transformation where each input partition is used to create only one output partition
+    •	Data stays within one partition (no shuffle)
+    •	Faster execution
+ Examples:
+    •	map() → apply function to each element
+    •	filter() → select some elements
+    •	flatMap() → flatten data
+
+ Wide transformation: A transformation where data from multiple partitions is shuffled and combined to create new partitions
+     •	Data moves across partitions (shuffle happens)
+    •	More expensive
+Examples:
+    •	groupByKey()
+    •	reduceByKey()
+    •	join()
+    •	distinct()
+
+
+
+7. what is Actions ?
+  Actions are applied on an RDD, which instructs Spark to apply computation and sent the result to the driver
+   --------------------------------------
+     Action         |  Meaning
+  ---------------------------------------
+    Collect()       | Returns all data to driver
+    Count()         | Counts no of elements
+
+8. What is a Lineage Graph ?
+ A Lineage Graph (also known as the RDD Operator Graph) is a record of all the parent RDDs used to create a child RDD. Since RDDs are immutable, Spark doesn't change data; it creates new RDDs. If a node fails and a partition of data is lost, Spark looks at the lineage graph to see exactly which transformations were applied to the original data source and re-runs them to recover the lost partition.
+
+
+
+3. What are the Spark Terminologies?
+Spark Context
+Spark Shell
+Spark Application
+Job
+Stage
+Task
+
+
+What are the different cluster managers in Spark? 
+Ans: There are three different cluster managers in Spark – YARN, Spache Mesos, and standalone deployments. 
+
+What is Shuffling?
+Ans: Shuffling is the redistribution of data across partitions. Data transfer across stages happens during shuffling. It may lead to data movement across the Java Virtual Machines processes. Data redistribution between executors on separate machines is also called shuffling. 
+
+
+How do you achieve fault tolerance in Spark?
+
+Spark achieves fault tolerance through two main methods:
+
+Lineage: As mentioned, Spark can recompute lost partitions using the lineage graph.
+Checkpointing: For applications with very long or complex lineages (like streaming or iterative ML), Spark can save the RDD's state to a reliable storage system (like S3 or HDFS). This "cuts" the lineage, so if a failure occurs, Spark only has to recompute from the last checkpoint.
