@@ -1,0 +1,36 @@
+
+1. Why Sprak
+2. Spark vs Map Reduce
+3. Spark Eco system
+3. Spark Architecture
+     Driver
+     cluster Manager
+     Executors
+     Spark Context
+4. RDD
+     Lazy Evaluation
+     Lineage
+     Narrow transforamtion & Wide transforamtion 
+     Repartition & Coalesce     
+     DAG
+     RDD cache
+5. Applications
+       Jobs
+       Stages
+       Tasks
+       AQE
+6.Joins
+     Sort Merge Join
+     Shuffle Hash Join
+     Broadcast Join
+7. Driver Memory Management
+8. Executor Memory Management
+9.Caching
+10. Partition Prunning
+11.Accumulators
+12. Catalyst Optimization
+13.Shuffle Mechanics
+14. Performace tunning
+
+
+
