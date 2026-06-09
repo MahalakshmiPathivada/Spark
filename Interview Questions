@@ -2,6 +2,9 @@
 Apache Spark is a distributed data processing engine that uses DAG-based execution, in-memory computation, and parallel processing to efficiently handle large-scale data workloads.
 or
 Spark is a super-fast cluster computing technology. It is a distributed data processing engine that can be used to solve a variety of complex problems and perform highly complex computations
+or
+Apache Spark is an open-source distributed data processing framework designed for large-scale data processing. It provides in-memory computation, making it much faster than traditional Hadoop MapReduce for many workloads.
+
 
 2. What are the Feature of spark?
   a.	Speed          -->   Spark runs up to 100 times faster than Hadoop MapReduce for large-scale data processing. It is also able to achieve this speed through controlled partitioning.
@@ -10,7 +13,7 @@ Spark is a super-fast cluster computing technology. It is a distributed data pro
   d.    Real-Time      -->   It offers Real-time computation & low latency because of in-memory computation.
   e.    Polyglot     -->    Spark provides high-level APIs in Java, Scala, Python, and R. Spark code can be written in any of these four languages. It also provides a shell in Scala and Python.
 
-3. Name the components in the Spark ecosystem ? 
+3. Name the components in the Spark ecosystem ?  or  Spark Terminologies?  or What are the main components of Spark?
  The components in the Spark ecosystem are: 
     ⇒ Spark Streaming – It is responsible for processing the real-time streaming data.
     ⇒ GraphX – It implements graphs and parallel computations on the graphs.
@@ -29,6 +32,10 @@ Spark is a super-fast cluster computing technology. It is a distributed data pro
 
  RDD is immutable, meaning that it cannot be modified once created, but it can be transformed at any time. Every Dataset in RDD is divided into multiple logical partitions, and this distribution is done by Spark.
  An RDD can be created from existing data in your program or from external storage like HDFS/ ADLS. It supports two types of operations: transformations and actions
+Example:
+
+rdd = spark.sparkContext.parallelize([1,2,3,4])
+----------
 
 5. what is Transformations?
   RDD transformations are lazy operations that create a new RDD from an existing one, such as map and filter.
@@ -64,16 +71,12 @@ Examples:
 
 8. What is a Lineage Graph ?
  A Lineage Graph (also known as the RDD Operator Graph) is a record of all the parent RDDs used to create a child RDD. Since RDDs are immutable, Spark doesn't change data; it creates new RDDs. If a node fails and a partition of data is lost, Spark looks at the lineage graph to see exactly which transformations were applied to the original data source and re-runs them to recover the lost partition.
+Example:
 
+rdd1 -> map -> filter -> reduce
 
+If data is lost, Spark rebuilds it using lineage information.
 
-3. What are the Spark Terminologies?
-Spark Context
-Spark Shell
-Spark Application
-Job
-Stage
-Task
 
 
 What are the different cluster managers in Spark? 
@@ -94,48 +97,8 @@ Checkpointing: For applications with very long or complex lineages (like streami
 
 Apache Spark Interview Questions and Answers
 
-1. What is Apache Spark?
-
-Answer: Apache Spark is an open-source distributed data processing framework designed for large-scale data processing. It provides in-memory computation, making it much faster than traditional Hadoop MapReduce for many workloads.
 
 
----
-
-2. What are the main components of Spark?
-
-Answer:
-
-Spark Core – Basic execution engine.
-
-Spark SQL – Structured data processing.
-
-Spark Streaming / Structured Streaming – Real-time data processing.
-
-MLlib – Machine learning library.
-
-GraphX – Graph processing.
-
-
-
----
-
-3. What is an RDD?
-
-Answer: RDD (Resilient Distributed Dataset) is Spark's fundamental distributed collection of data. It is:
-
-Immutable
-
-Distributed across nodes
-
-Fault-tolerant through lineage
-
-
-Example:
-
-rdd = spark.sparkContext.parallelize([1,2,3,4])
-
-
----
 
 4. What is the difference between RDD, DataFrame, and Dataset?
 
@@ -204,18 +167,7 @@ Answer: DAG (Directed Acyclic Graph) represents the sequence of transformations.
 
 ---
 
-8. What is Lineage?
 
-Answer: Lineage tracks all transformations applied to an RDD/DataFrame.
-
-Example:
-
-rdd1 -> map -> filter -> reduce
-
-If data is lost, Spark rebuilds it using lineage information.
-
-
----
 
 9. Difference between cache() and persist()?
 
