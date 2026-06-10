@@ -1,0 +1,33 @@
+PySpark Concept
+1. What is PySpark?
+Ans: PySpark is the Python API for Apache Spark.
+It is used to process large data in a distributed way using Python.
+2. What is a SparkSession?
+Ans: SparkSession is the entry point to work with PySpark. It is used to create DataFrames, read data, and run SQL queries.
+3. What is a DataFrame in PySpark?
+Ans: A DataFrame is a distributed collection of data organized into rows and columns.
+It is similar to a table in a database.
+4. What are transformations and actions in PySpark?
+Ans:
+Transformations: These operations create a new DataFrame (e.g., filter(), select()).
+Actions: These operations trigger execution and return a result (e.g., show(), count()).
+5. What is lazy evaluation in PySpark?
+Ans: PySpark does not execute transformations immediately. It waits until an action is called, then it executes all the operations.
+
+6. What is an RDD in PySpark?
+Ans: RDD (Resilient Distributed Dataset) is a distributed collection of data. It is immutable and fault-tolerant.
+It can be processed in parallel.
+7. What is the difference between RDD and DataFrame?
+Ans:
+• RDD is a low-level API, DataFrame is a high-level API.
+• RDD has no schema, DataFrame has a schema.
+• DataFrame is faster because it is optimized.
+• DataFrame is easy to use with SQL.
+8. What are transformations in PySpark?
+Ans: Transformations are operations that create a new DataFrame or RDD. They are lazy, means they are not executed immediately.
+Example: filter(), select(), map()
+9. What are actions in PySpark?
+Ans: Actions are operations that trigger the execution and return a result.
+Example: show(), count(), collect()
+10. What is lazy evaluation in PySpark?
+Ans: PySpark does not run transformations immediately. It builds a plan and waits until an action is called, then it executes all the transformations.
