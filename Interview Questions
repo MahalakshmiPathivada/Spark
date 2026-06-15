@@ -564,3 +564,576 @@ Whole-stage code generation reduces CPU overhead.
 
 Columnar processing reduces I/O.
 
+Apache Spark Interview Questions & Answers (Text Version)
+
+1. What is Apache Spark?
+
+Answer: Apache Spark is a fast, open-source big data processing framework used to process large amounts of data in parallel across a cluster of machines.
+
+
+---
+
+2. Why is Spark faster than Hadoop (MapReduce)?
+
+Answer: Spark is faster because:
+
+It processes data in memory (RAM) instead of writing intermediate results to disk.
+
+It has an optimized execution engine.
+
+It supports in-memory caching.
+
+
+Hadoop (MapReduce)	Apache Spark
+
+Disk-based	Memory-based
+Slow	Fast
+Multiple disk I/O	Less disk I/O
+High latency	Low latency
+
+
+
+---
+
+3. What is Distributed Computing?
+
+Answer: Distributed computing is a technique where many computers (nodes) work together to solve a large problem by dividing it into smaller parts.
+
+
+---
+
+4. What is RDD in Spark?
+
+Answer: RDD (Resilient Distributed Dataset) is the fundamental data structure in Spark.
+
+Features:
+
+Immutable (read-only) collection of data.
+
+Distributed across the cluster.
+
+Can be recreated if lost.
+
+
+
+---
+
+5. What is a DataFrame in Spark?
+
+Answer: A DataFrame is a distributed collection of data organized into named columns.
+
+Features:
+
+Similar to a table in a relational database or Excel sheet.
+
+Provides high-level APIs.
+
+Optimized and faster than RDD.
+
+
+
+---
+
+Spark Core Components
+
+1. Driver Program
+
+Main process of the application.
+
+Creates SparkContext / SparkSession.
+
+Schedules tasks and coordinates execution.
+
+
+2. Cluster Manager
+
+Manages resources in the cluster.
+
+Allocates resources to applications.
+
+
+Examples:
+
+Standalone
+
+YARN
+
+Mesos
+
+Kubernetes
+
+
+3. Executor
+
+Worker processes that run tasks.
+
+Execute code assigned by the Driver.
+
+Store data in memory or disk.
+
+
+4. Task
+
+Smallest unit of work.
+
+Sent to executors for execution.
+
+
+5. Job
+
+A complete action such as:
+
+count()
+
+show()
+
+
+A job consists of multiple stages.
+
+
+
+---
+
+Narrow vs Wide Transformations
+
+Narrow	Wide
+
+No data shuffle required	Data shuffle required
+Data stays in same partition	Data moves across partitions
+Faster	Slower
+map(), filter(), select()	groupBy(), join(), distinct()
+
+
+
+---
+
+6. What is a Spark RDD and its Key Properties?
+
+Answer: RDD (Resilient Distributed Dataset) is an immutable distributed collection of data.
+
+Key Properties
+
+Immutable (read-only)
+
+Distributed across cluster
+
+Partitioned
+
+Supports parallel operations
+
+Fault-tolerant (lineage-based)
+
+Lazy evaluation
+
+
+Common RDD Operations
+
+map()
+
+filter()
+
+flatMap()
+
+reduce()
+
+groupBy()
+
+union()
+
+
+
+---
+
+7. What is a DataFrame in Spark?
+
+Answer: A DataFrame is a distributed collection of data organized into named columns.
+
+Features
+
+Similar to an SQL table.
+
+Provides high-level APIs.
+
+Built on top of RDD.
+
+
+Example:
+
+Name	Age	City	Salary
+
+John	25	Delhi	50000
+Sam	30	Mumbai	60000
+Alice	22	Pune	55000
+
+
+
+---
+
+8. What is Spark SQL?
+
+Answer: Spark SQL is a module for structured data processing.
+
+Features
+
+SQL querying
+
+DataFrame APIs
+
+Dataset APIs
+
+Optimization using Catalyst Optimizer
+
+
+
+---
+
+9. What is Lazy Evaluation?
+
+Answer: Spark does not execute transformations immediately.
+
+Instead:
+
+1. Builds a DAG (Directed Acyclic Graph)
+
+
+2. Executes only when an Action is called
+
+
+
+Example:
+
+df.filter(...).groupBy(...)
+
+Execution starts only when:
+
+show()
+count()
+collect()
+
+are called.
+
+
+---
+
+10. What are Spark Deployment Modes?
+
+Answer:
+
+Mode	Description
+
+Local	Runs Spark on a single machine
+Standalone	Spark's own cluster manager
+YARN	Runs Spark on Hadoop YARN
+Mesos	Runs Spark on Apache Mesos
+Kubernetes	Runs Spark on Kubernetes
+
+
+
+---
+
+RDD vs DataFrame
+
+RDD	DataFrame
+
+Low-level API	High-level API
+No schema	Has schema
+Less optimized	More optimized
+More memory usage	Less memory usage
+Row-based operations	Columnar operations
+
+
+
+---
+
+11. What is an Accumulator in Spark?
+
+Answer: An accumulator is a write-only variable used to add values from executors and send the result back to the driver.
+
+Features
+
+Only add operations allowed.
+
+Useful for counters, sums, metrics.
+
+Driver can read the value.
+
+
+
+---
+
+12. What is a Broadcast Variable in Spark?
+
+Answer: A broadcast variable is used to send a large read-only value to all executors efficiently.
+
+Features
+
+Cached on each executor.
+
+Saves network bandwidth.
+
+Reduces serialization cost.
+
+Ideal for lookup tables and configuration data.
+
+
+
+---
+
+13. What is Shuffle in Spark?
+
+Answer: Shuffle is the process of moving data between executors for operations such as:
+
+groupByKey()
+
+join()
+
+reduceByKey()
+
+distinct()
+
+
+Shuffle Activities
+
+Data transfer
+
+Sorting
+
+Merging
+
+
+Optimization
+
+Proper partitioning
+
+Map-side aggregation
+
+
+
+---
+
+14. What are Deployment Modes in Spark?
+
+Answer:
+
+Mode	Description	Use Case
+
+Local	Single machine	Development & Testing
+Standalone	Spark cluster manager	Small/Medium clusters
+YARN	Hadoop cluster	Production
+Mesos	Apache Mesos	Shared clusters
+Kubernetes	Kubernetes platform	Cloud-native environments
+
+
+
+---
+
+15. What is Spark SQL?
+
+Answer: Spark SQL is a module for structured data processing.
+
+Features
+
+DataFrame API
+
+SQL Interface
+
+Supports Datasets
+
+Catalyst Optimizer
+
+Integrates with Hive, Parquet, JSON, JDBC, etc.
+
+
+
+---
+
+16. What is Catalyst Optimizer in Spark?
+
+Answer: Catalyst Optimizer is the query optimization engine of Spark SQL.
+
+Responsibilities
+
+Converts logical plans into optimized physical execution plans.
+
+Uses rule-based and cost-based optimization.
+
+
+Optimization Techniques
+
+Predicate Pushdown
+
+Projection Pruning
+
+Column Pruning
+
+Constant Folding
+
+Join Reordering
+
+Subquery Elimination
+
+
+Flow
+
+Unresolved Logical Plan
+       ↓
+Analyzed Logical Plan
+       ↓
+Optimized Logical Plan
+       ↓
+Physical Execution Plan
+
+
+---
+
+17. What is Tungsten in Spark?
+
+Answer: Tungsten is Spark's low-level execution engine that improves performance and memory management.
+
+Features
+
+Off-heap memory management
+
+Memory pooling
+
+Whole-stage code generation
+
+Efficient serialization
+
+Cache-friendly memory layout
+
+
+Benefits
+
+Faster execution
+
+Reduced JVM garbage collection
+
+Better resource utilization
+
+
+
+---
+
+18. What is Spark Streaming?
+
+Answer: Spark Streaming is Spark's component for real-time stream processing.
+
+Features
+
+Processes data in micro-batches.
+
+High throughput.
+
+Fault tolerant.
+
+Reads from Kafka, Flume, Kinesis, etc.
+
+Uses DStreams.
+
+
+
+---
+
+19. What is MLlib in Spark?
+
+Answer: MLlib is Spark's machine learning library.
+
+Supported Algorithms
+
+Classification
+
+Logistic Regression
+
+Naive Bayes
+
+SVM
+
+Decision Tree
+
+
+Regression
+
+Linear Regression
+
+Ridge Regression
+
+Lasso Regression
+
+
+Clustering
+
+K-Means
+
+Gaussian Mixture
+
+
+Recommendation
+
+ALS (Alternating Least Squares)
+
+
+Feature Extraction
+
+PCA
+
+SVD
+
+
+
+---
+
+20. What is Spark on Kubernetes?
+
+Answer: Spark on Kubernetes allows Spark applications to run on Kubernetes clusters.
+
+Benefits
+
+Scalability
+
+High Availability
+
+Resource Isolation
+
+Auto Recovery
+
+Easy Deployment
+
+
+Features
+
+Automatic resource allocation
+
+Supports batch and streaming workloads
+
+Uses Kubernetes API for deployment and management
+
+
+
+---
+
+Spark Interview Quick Revision
+
+RDD → Immutable distributed dataset.
+
+DataFrame → Schema-based tabular data.
+
+Spark SQL → Structured data processing.
+
+Lazy Evaluation → Execution starts only on Action.
+
+Accumulator → Write-only shared variable.
+
+Broadcast Variable → Read-only shared variable.
+
+Shuffle → Data movement between partitions.
+
+Catalyst Optimizer → Query optimization engine.
+
+Tungsten → Performance and memory optimization engine.
+
+Spark Streaming → Real-time data processing.
+
+MLlib → Machine learning library.
+
+Kubernetes → Cloud-native Spark deployment.
