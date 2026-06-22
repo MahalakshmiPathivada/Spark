@@ -1,9 +1,25 @@
+
 1.  What is Spark?
 Apache Spark is a distributed data processing engine that uses DAG-based execution, in-memory computation, and parallel processing to efficiently handle large-scale data workloads.
 or
 Spark is a super-fast cluster computing technology. It is a distributed data processing engine that can be used to solve a variety of complex problems and perform highly complex computations
 or
 Apache Spark is an open-source distributed data processing framework designed for large-scale data processing. It provides in-memory computation, making it much faster than traditional Hadoop MapReduce for many workloads.
+
+
+ Why is Spark faster than Hadoop (MapReduce)?
+Spark is faster because:
+It processes data in memory (RAM) instead of writing intermediate results to disk.
+It has an optimized execution engine.
+It supports in-memory caching.
+
+
+Hadoop (MapReduce) |	Apache Spark
+-----------------------------------------------
+	Disk-based	   | Memory-based
+	Slow	       |     Fast
+Multiple disk I/O  | Less disk I/O
+High latency	   |  Low latency
 
 
 2. What are the Feature of spark?
@@ -59,8 +75,6 @@ Examples:
     •	join()
     •	distinct()
 
-
-
 7. what is Actions ?
   Actions are applied on an RDD, which instructs Spark to apply computation and sent the result to the driver
    --------------------------------------
@@ -77,6 +91,92 @@ rdd1 -> map -> filter -> reduce
 
 If data is lost, Spark rebuilds it using lineage information.
 
+9. What is a DAG in Spark?
+ DAG (Directed Acyclic Graph) represents the sequence of transformations. Spark's DAG Scheduler divides jobs into stages and tasks for efficient execution.
+ It is a execution blue print of  data pipelines
+
+10. Difference between DAG and Lineage Graph
++--------------+----------------------------------+--------------------------------------+
+| Feature      | Lineage                          | DAG (Directed Acyclic Graph)         |
++--------------+----------------------------------+--------------------------------------+
+| Meaning      | History of transformations       | Execution graph                      |
++--------------+----------------------------------+--------------------------------------+
+| Level        | Logical                          | Physical / Execution                 |
++--------------+----------------------------------+--------------------------------------+
+| Structure    | Linear chain                     | Graph (nodes + edges)                |
++--------------+----------------------------------+--------------------------------------+
+| Purpose      | Fault tolerance                  | Execution planning                   |
++--------------+----------------------------------+--------------------------------------+
+| Created When | During transformations           | During action                        |
++--------------+----------------------------------+--------------------------------------+
+| Used For     | Recomputing data                 | Scheduling tasks                     |
++--------------+----------------------------------+--------------------------------------+
+
+11. What is Lazy Evaluation?
+ Spark does not execute transformations immediately. It builds a DAG (Directed Acyclic Graph) and executes only when an action is called.
+
+Example: 
+df.filter(df.age > 30)   
+No execution occurs until:  df.count()
+
+12. What is the difference between RDD, DataFrame, and Dataset?
+
+DataFrames and Datasets are high-level APIs built on top of RDDs, where Spark uses Catalyst optimizer and Tungsten engine to convert operations into optimized RDD execution
+
+RDD → Control + Flexibility, but slow     --> rarely used
+DataFrame → Fast + Easy, but no type safety      --> 90% use cases
+Dataset → Best of both (but limited language support)  → used in Scala-heavy projects
+
+
+------------------+----------------------+--------------------------+----------------------------+
+| Feature          | RDD                  | DataFrame                | Dataset                   |
++------------------+----------------------+--------------------------+----------------------------+
+| Full Form        | Resilient Distributed| Distributed collection   | Typed distributed         |
+|                  | Dataset              | of data with schema      | collection (RDD + DF)     |
++------------------+----------------------+--------------------------+----------------------------+
+| Type Safety      | Yes                  | No                       | Yes                       |
++------------------+----------------------+--------------------------+----------------------------+
+| Schema           | No schema            | Has schema               | Has schema                |
++------------------+----------------------+--------------------------+----------------------------+
+| Optimization     | No                   | Catalyst optimizer       | Catalyst optimizer        |
++------------------+----------------------+--------------------------+----------------------------+
+| Performance      | Lowest               | High                     | High                      |
++------------------+----------------------+--------------------------+----------------------------+
+| API Level        | Low-level            | High-level               | High-level                |
++------------------+----------------------+--------------------------+----------------------------+
+| Language Support | Java, Scala, Python  | Java, Scala, Python      | Scala, Java only          |
++------------------+----------------------+--------------------------+----------------------------+
+| Ease of Use      | Harder               | Easy (SQL-like)          | Moderate                  |
++------------------+----------------------+--------------------------+----------------------------+
+| Serialization    | Java/Python objects  | Tungsten (optimized)     | Encoders (optimized)      |
++------------------+----------------------+--------------------------+----------------------------+
+
+Dataset = DataFrame + Type Information
+
+14. What is Catalyst Optimizer and Tungsten ?
+ Catalyst is Spark’s query optimizer that transforms logical plans into optimized physical plans, while Tungsten is the execution engine that improves runtime performance using memory management and code generation
+
+Optimizations Does It Do?
+Predicate pushdown ✅
+Column pruning ✅
+Constant folding ✅
+Join optimization ✅
+
+DataFrame Query
+        ↓
+Catalyst Optimizer (plans & optimizes)
+        ↓
+Tungsten Engine (executes efficiently)
+        ↓
+RDD execution on cluster
+
+15. What is Tungsten?
+ Tungsten improves Spark performance through:
+
+Better memory management
+CPU optimization
+Binary processing
+Whole-stage code generation
 
 
 What are the different cluster managers in Spark? 
@@ -95,77 +195,7 @@ Checkpointing: For applications with very long or complex lineages (like streami
 
 
 
-Apache Spark Interview Questions and Answers
 
-
-
-
-4. What is the difference between RDD, DataFrame, and Dataset?
-
-Feature	RDD	DataFrame	Dataset
-
-Type Safety	Yes	No	Yes
-Optimization	No	Catalyst	Catalyst
-Performance	Lower	Higher	Higher
-Language Support	All	All	Scala/Java
-
-
-Answer: DataFrames are generally preferred because Spark can optimize execution using the Catalyst Optimizer.
-
-
----
-
-5. What are Transformations and Actions?
-
-Transformations
-
-Create a new dataset.
-
-Lazy execution.
-
-
-Examples:
-
-map()
-filter()
-groupBy()
-
-Actions
-
-Trigger execution.
-
-
-Examples:
-
-count()
-collect()
-show()
-save()
-
-
----
-
-6. What is Lazy Evaluation?
-
-Answer: Spark does not execute transformations immediately. It builds a DAG (Directed Acyclic Graph) and executes only when an action is called.
-
-Example:
-
-df.filter(df.age > 30)
-
-No execution occurs until:
-
-df.count()
-
-
----
-
-7. What is a DAG in Spark?
-
-Answer: DAG (Directed Acyclic Graph) represents the sequence of transformations. Spark's DAG Scheduler divides jobs into stages and tasks for efficient execution.
-
-
----
 
 
 
@@ -252,22 +282,16 @@ Answer: Variables used for counters and aggregations.
 Example:
 
 acc = spark.sparkContext.accumulator(0)
-
 Used for:
-
 Error counts
-
 Record counts
-
 Monitoring
 
 
 
 ---
 
-14. What is Catalyst Optimizer?
 
-Answer: Catalyst is Spark SQL's query optimization framework.
 
 It performs:
 
@@ -285,17 +309,7 @@ Result: Faster query execution.
 
 ---
 
-15. What is Tungsten?
 
-Answer: Tungsten improves Spark performance through:
-
-Better memory management
-
-CPU optimization
-
-Binary processing
-
-Whole-stage code generation
 
 
 
@@ -325,21 +339,14 @@ Answer: Data skew occurs when some partitions contain significantly more data th
 Problem:
 
 Some executors finish quickly.
-
 One executor takes much longer.
 
 
 Solutions:
-
 Salting
-
 Broadcast joins
-
 Repartitioning
-
 AQE (Adaptive Query Execution)
-
-
 
 ---
 
@@ -350,16 +357,10 @@ Answer: When one table is small, Spark broadcasts it to all executors.
 Example:
 
 from pyspark.sql.functions import broadcast
-
 df1.join(broadcast(df2), "id")
-
 Benefits:
-
 No shuffle
-
 Faster joins
-
-
 
 ---
 
@@ -368,11 +369,8 @@ Faster joins
 Answer: AQE dynamically optimizes query execution at runtime.
 
 Features:
-
 Dynamic join strategy selection
-
 Skew handling
-
 Partition coalescing
 
 
@@ -388,30 +386,13 @@ spark.conf.set("spark.sql.adaptive.enabled", "true")
 Answer:
 
 1. Use DataFrames instead of RDDs.
-
-
 2. Cache reused datasets.
-
-
 3. Use broadcast joins.
-
-
 4. Avoid unnecessary shuffles.
-
-
 5. Use partition pruning.
-
-
 6. Use Parquet format.
-
-
 7. Tune executor memory and cores.
-
-
 8. Enable AQE.
-
-
-
 
 ---
 
@@ -486,19 +467,11 @@ Result: Better performance and lower storage.
 
 Answer:
 
-Job
+Job    --> Triggered by an action.
 
-Triggered by an action.
+Stage   -->  Group of transformations.
 
-
-Stage
-
-Group of transformations.
-
-
-Task
-
-Smallest unit executed on a partition.
+Task  -->  Smallest unit executed on a partition.
 
 
 Example:
@@ -519,78 +492,14 @@ Tasks
 Answer:
 
 1. Check Spark UI.
-
-
 2. Identify shuffle-heavy stages.
-
-
 3. Check data skew.
-
-
 4. Verify partition count.
-
-
 5. Check executor memory usage.
-
-
 6. Examine joins.
-
-
 7. Enable AQE.
-
-
 8. Use broadcast joins where possible.
-
-
-9. Review DAG execution plan:
-
-
-
-df.explain(True)
-
-Interview Tip
-
-A very common question is:
-
-"Why are DataFrames faster than RDDs?"
-
-Answer:
-
-Catalyst Optimizer optimizes queries.
-
-Tungsten improves memory usage.
-
-Whole-stage code generation reduces CPU overhead.
-
-Columnar processing reduces I/O.
-
-Apache Spark Interview Questions & Answers (Text Version)
-
-1. What is Apache Spark?
-
-Answer: Apache Spark is a fast, open-source big data processing framework used to process large amounts of data in parallel across a cluster of machines.
-
-
----
-
-2. Why is Spark faster than Hadoop (MapReduce)?
-
-Answer: Spark is faster because:
-
-It processes data in memory (RAM) instead of writing intermediate results to disk.
-
-It has an optimized execution engine.
-
-It supports in-memory caching.
-
-
-Hadoop (MapReduce)	Apache Spark
-
-Disk-based	Memory-based
-Slow	Fast
-Multiple disk I/O	Less disk I/O
-High latency	Low latency
-
+9. Review DAG execution plan
 
 
 ---
@@ -599,24 +508,6 @@ High latency	Low latency
 
 Answer: Distributed computing is a technique where many computers (nodes) work together to solve a large problem by dividing it into smaller parts.
 
-
----
-
-4. What is RDD in Spark?
-
-Answer: RDD (Resilient Distributed Dataset) is the fundamental data structure in Spark.
-
-Features:
-
-Immutable (read-only) collection of data.
-
-Distributed across the cluster.
-
-Can be recreated if lost.
-
-
-
----
 
 5. What is a DataFrame in Spark?
 
@@ -684,7 +575,6 @@ Sent to executors for execution.
 A complete action such as:
 
 count()
-
 show()
 
 
@@ -692,158 +582,12 @@ A job consists of multiple stages.
 
 
 
----
 
-Narrow vs Wide Transformations
 
-Narrow	Wide
 
-No data shuffle required	Data shuffle required
-Data stays in same partition	Data moves across partitions
-Faster	Slower
-map(), filter(), select()	groupBy(), join(), distinct()
 
 
-
----
-
-6. What is a Spark RDD and its Key Properties?
-
-Answer: RDD (Resilient Distributed Dataset) is an immutable distributed collection of data.
-
-Key Properties
-
-Immutable (read-only)
-
-Distributed across cluster
-
-Partitioned
-
-Supports parallel operations
-
-Fault-tolerant (lineage-based)
-
-Lazy evaluation
-
-
-Common RDD Operations
-
-map()
-
-filter()
-
-flatMap()
-
-reduce()
-
-groupBy()
-
-union()
-
-
-
----
-
-7. What is a DataFrame in Spark?
-
-Answer: A DataFrame is a distributed collection of data organized into named columns.
-
-Features
-
-Similar to an SQL table.
-
-Provides high-level APIs.
-
-Built on top of RDD.
-
-
-Example:
-
-Name	Age	City	Salary
-
-John	25	Delhi	50000
-Sam	30	Mumbai	60000
-Alice	22	Pune	55000
-
-
-
----
-
-8. What is Spark SQL?
-
-Answer: Spark SQL is a module for structured data processing.
-
-Features
-
-SQL querying
-
-DataFrame APIs
-
-Dataset APIs
-
-Optimization using Catalyst Optimizer
-
-
-
----
-
-9. What is Lazy Evaluation?
-
-Answer: Spark does not execute transformations immediately.
-
-Instead:
-
-1. Builds a DAG (Directed Acyclic Graph)
-
-
-2. Executes only when an Action is called
-
-
-
-Example:
-
-df.filter(...).groupBy(...)
-
-Execution starts only when:
-
-show()
-count()
-collect()
-
-are called.
-
-
----
-
-10. What are Spark Deployment Modes?
-
-Answer:
-
-Mode	Description
-
-Local	Runs Spark on a single machine
-Standalone	Spark's own cluster manager
-YARN	Runs Spark on Hadoop YARN
-Mesos	Runs Spark on Apache Mesos
-Kubernetes	Runs Spark on Kubernetes
-
-
-
----
-
-RDD vs DataFrame
-
-RDD	DataFrame
-
-Low-level API	High-level API
-No schema	Has schema
-Less optimized	More optimized
-More memory usage	Less memory usage
-Row-based operations	Columnar operations
-
-
-
----
+--
 
 11. What is an Accumulator in Spark?
 
@@ -852,12 +596,8 @@ Answer: An accumulator is a write-only variable used to add values from executor
 Features
 
 Only add operations allowed.
-
 Useful for counters, sums, metrics.
-
 Driver can read the value.
-
-
 
 ---
 
@@ -866,45 +606,29 @@ Driver can read the value.
 Answer: A broadcast variable is used to send a large read-only value to all executors efficiently.
 
 Features
-
 Cached on each executor.
-
 Saves network bandwidth.
-
 Reduces serialization cost.
-
 Ideal for lookup tables and configuration data.
-
-
 
 ---
 
 13. What is Shuffle in Spark?
 
 Answer: Shuffle is the process of moving data between executors for operations such as:
-
 groupByKey()
-
 join()
-
 reduceByKey()
-
 distinct()
 
-
 Shuffle Activities
-
 Data transfer
-
 Sorting
-
 Merging
-
 
 Optimization
 
 Proper partitioning
-
 Map-side aggregation
 
 
@@ -913,106 +637,27 @@ Map-side aggregation
 
 14. What are Deployment Modes in Spark?
 
-Answer:
-
-Mode	Description	Use Case
-
-Local	Single machine	Development & Testing
-Standalone	Spark cluster manager	Small/Medium clusters
-YARN	Hadoop cluster	Production
-Mesos	Apache Mesos	Shared clusters
-Kubernetes	Kubernetes platform	Cloud-native environments
-
+  Mode	   |	Description	      |     Use Case
+--------------------------------------------------
+  Local	   |    Single machine    |	Development & Testing
+Standalone | Spark cluster manager|	Small/Medium clusters
+YARN	   | Hadoop cluster       | Production
+Mesos	   | Apache Mesos	      | Shared clusters
+Kubernetes |Kubernetes platform	  | Cloud-native environments
 
 
 ---
 
 15. What is Spark SQL?
-
-Answer: Spark SQL is a module for structured data processing.
+ Spark SQL is a module for structured data processing.
 
 Features
-
 DataFrame API
-
 SQL Interface
-
 Supports Datasets
-
 Catalyst Optimizer
 
 Integrates with Hive, Parquet, JSON, JDBC, etc.
-
-
-
----
-
-16. What is Catalyst Optimizer in Spark?
-
-Answer: Catalyst Optimizer is the query optimization engine of Spark SQL.
-
-Responsibilities
-
-Converts logical plans into optimized physical execution plans.
-
-Uses rule-based and cost-based optimization.
-
-
-Optimization Techniques
-
-Predicate Pushdown
-
-Projection Pruning
-
-Column Pruning
-
-Constant Folding
-
-Join Reordering
-
-Subquery Elimination
-
-
-Flow
-
-Unresolved Logical Plan
-       ↓
-Analyzed Logical Plan
-       ↓
-Optimized Logical Plan
-       ↓
-Physical Execution Plan
-
-
----
-
-17. What is Tungsten in Spark?
-
-Answer: Tungsten is Spark's low-level execution engine that improves performance and memory management.
-
-Features
-
-Off-heap memory management
-
-Memory pooling
-
-Whole-stage code generation
-
-Efficient serialization
-
-Cache-friendly memory layout
-
-
-Benefits
-
-Faster execution
-
-Reduced JVM garbage collection
-
-Better resource utilization
-
-
-
 ---
 
 18. What is Spark Streaming?
@@ -1020,97 +665,13 @@ Better resource utilization
 Answer: Spark Streaming is Spark's component for real-time stream processing.
 
 Features
-
 Processes data in micro-batches.
-
 High throughput.
-
 Fault tolerant.
-
 Reads from Kafka, Flume, Kinesis, etc.
-
 Uses DStreams.
 
-
-
----
-
-19. What is MLlib in Spark?
-
-Answer: MLlib is Spark's machine learning library.
-
-Supported Algorithms
-
-Classification
-
-Logistic Regression
-
-Naive Bayes
-
-SVM
-
-Decision Tree
-
-
-Regression
-
-Linear Regression
-
-Ridge Regression
-
-Lasso Regression
-
-
-Clustering
-
-K-Means
-
-Gaussian Mixture
-
-
-Recommendation
-
-ALS (Alternating Least Squares)
-
-
-Feature Extraction
-
-PCA
-
-SVD
-
-
-
----
-
-20. What is Spark on Kubernetes?
-
-Answer: Spark on Kubernetes allows Spark applications to run on Kubernetes clusters.
-
-Benefits
-
-Scalability
-
-High Availability
-
-Resource Isolation
-
-Auto Recovery
-
-Easy Deployment
-
-
-Features
-
-Automatic resource allocation
-
-Supports batch and streaming workloads
-
-Uses Kubernetes API for deployment and management
-
-
-
----
+-----------------------------------
 
 Spark Interview Quick Revision
 
