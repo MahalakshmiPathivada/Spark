@@ -74,6 +74,7 @@ Examples:
     •	reduceByKey()
     •	join()
     •	distinct()
+    •  repartition()
 
 7. what is Actions ?
   Actions are applied on an RDD, which instructs Spark to apply computation and sent the result to the driver
@@ -185,516 +186,77 @@ Ans: There are three different cluster managers in Spark – YARN, Spache Mesos,
 What is Shuffling?
 Ans: Shuffling is the redistribution of data across partitions. Data transfer across stages happens during shuffling. It may lead to data movement across the Java Virtual Machines processes. Data redistribution between executors on separate machines is also called shuffling. 
 
-
-How do you achieve fault tolerance in Spark?
-
-Spark achieves fault tolerance through two main methods:
-
-Lineage: As mentioned, Spark can recompute lost partitions using the lineage graph.
-Checkpointing: For applications with very long or complex lineages (like streaming or iterative ML), Spark can save the RDD's state to a reliable storage system (like S3 or HDFS). This "cuts" the lineage, so if a failure occurs, Spark only has to recompute from the last checkpoint.
-
-
-
-
-
-
-
-9. Difference between cache() and persist()?
-
-cache()	persist()
-
-Stores in memory	Stores in memory/disk
-Default storage level	Custom storage levels
-
-
-Example:
-
-df.cache()
-df.persist()
-
-
----
-
-10. What is Shuffling?
-
-Answer: Shuffling is data movement across partitions/nodes.
-
-Examples:
-
-groupBy()
-join()
-distinct()
-
-Shuffling is expensive because it involves:
-
-Disk I/O
-
-Network I/O
-
-Serialization
-
-
-
----
-
-11. Difference between groupByKey() and reduceByKey()?
-
-groupByKey()
-
-Transfers all values over network.
-
-High memory consumption.
-
-
-reduceByKey()
-
-Performs local aggregation first.
-
-Better performance.
-
-
-Example:
-
-rdd.reduceByKey(lambda x,y:x+y)
-
-Preferred: reduceByKey()
-
-
----
-
-12. What is a Broadcast Variable?
-
-Answer: Broadcast variables distribute a read-only copy of data to all executors.
-
-Example:
-
-broadcastVar = spark.sparkContext.broadcast(lookup_dict)
-
-Used to optimize joins with small lookup tables.
-
-
----
-
-13. What are Accumulators?
-
-Answer: Variables used for counters and aggregations.
-
-Example:
-
-acc = spark.sparkContext.accumulator(0)
-Used for:
-Error counts
-Record counts
-Monitoring
-
-
-
----
-
-
-
-It performs:
-
-Predicate pushdown
-
-Constant folding
-
-Join reordering
-
-Column pruning
-
-
-Result: Faster query execution.
-
-
----
-
-
-
-
-
----
-
-16. Difference between repartition() and coalesce()?
-
-repartition()	coalesce()
-
-Increase/decrease partitions	Mainly decrease
-Causes shuffle	Minimal shuffle
-Expensive	Faster
-
-
-Example:
-
-df.repartition(100)
-df.coalesce(10)
-
-
----
-
-17. What is Data Skew?
-
-Answer: Data skew occurs when some partitions contain significantly more data than others.
-
-Problem:
-
-Some executors finish quickly.
-One executor takes much longer.
-
-
-Solutions:
-Salting
-Broadcast joins
-Repartitioning
-AQE (Adaptive Query Execution)
-
----
-
-18. What is a Broadcast Join?
-
-Answer: When one table is small, Spark broadcasts it to all executors.
-
-Example:
-
-from pyspark.sql.functions import broadcast
-df1.join(broadcast(df2), "id")
-Benefits:
-No shuffle
-Faster joins
-
----
-
-19. What is Adaptive Query Execution (AQE)?
-
-Answer: AQE dynamically optimizes query execution at runtime.
-
-Features:
-Dynamic join strategy selection
-Skew handling
-Partition coalescing
-
-
-Enable:
-
-spark.conf.set("spark.sql.adaptive.enabled", "true")
-
-
----
-
-20. How do you optimize Spark jobs?
-
-Answer:
-
-1. Use DataFrames instead of RDDs.
-2. Cache reused datasets.
-3. Use broadcast joins.
-4. Avoid unnecessary shuffles.
-5. Use partition pruning.
-6. Use Parquet format.
-7. Tune executor memory and cores.
-8. Enable AQE.
-
----
-
-21. What causes OutOfMemory (OOM) errors?
-
-Answer: Common reasons:
-
-Large collect()
-
-Data skew
-
-Insufficient executor memory
-
-Large shuffles
-
-Too many cached datasets
-
-
-Solutions:
-
-Increase executor memory
-
-Avoid collect()
-
-Use broadcast joins
-
-Repartition data
-
-
-
----
-
-22. What is Predicate Pushdown?
-
-Answer: Spark pushes filter conditions to the data source.
-
-Example:
-
-df.filter("country='India'")
-
-Only matching rows are read from storage.
-
-Benefits:
-
-Less I/O
-
-Faster execution
-
-
-
----
-
-23. Why is Parquet preferred in Spark?
-
-Answer: Parquet is:
-
-Columnar format
-
-Compressed
-
-Supports predicate pushdown
-
-Supports column pruning
-
-
-Result: Better performance and lower storage.
-
-
----
-
-24. Explain Spark Job → Stage → Task.
-
-Answer:
-
-Job    --> Triggered by an action.
-
-Stage   -->  Group of transformations.
-
-Task  -->  Smallest unit executed on a partition.
-
-
-Example:
-
-Action
-  ↓
-Job
-  ↓
-Stages
-  ↓
-Tasks
-
-
----
-
-25. Scenario: Spark job is slow. How will you troubleshoot?
-
-Answer:
-
-1. Check Spark UI.
-2. Identify shuffle-heavy stages.
-3. Check data skew.
-4. Verify partition count.
-5. Check executor memory usage.
-6. Examine joins.
-7. Enable AQE.
-8. Use broadcast joins where possible.
-9. Review DAG execution plan
-
-
----
-
-3. What is Distributed Computing?
-
-Answer: Distributed computing is a technique where many computers (nodes) work together to solve a large problem by dividing it into smaller parts.
-
-
-5. What is a DataFrame in Spark?
-
-Answer: A DataFrame is a distributed collection of data organized into named columns.
-
-Features:
-
-Similar to a table in a relational database or Excel sheet.
-
-Provides high-level APIs.
-
-Optimized and faster than RDD.
-
-
-
----
-
-Spark Core Components
-
-1. Driver Program
-
-Main process of the application.
-
-Creates SparkContext / SparkSession.
-
-Schedules tasks and coordinates execution.
-
-
-2. Cluster Manager
-
-Manages resources in the cluster.
-
-Allocates resources to applications.
-
-
-Examples:
-
-Standalone
-
-YARN
-
-Mesos
-
-Kubernetes
-
-
-3. Executor
-
-Worker processes that run tasks.
-
-Execute code assigned by the Driver.
-
-Store data in memory or disk.
-
-
-4. Task
-
-Smallest unit of work.
-
-Sent to executors for execution.
-
-
-5. Job
-
-A complete action such as:
-
-count()
-show()
-
-
-A job consists of multiple stages.
-
-
-
-
-
-
-
-
---
-
-11. What is an Accumulator in Spark?
-
-Answer: An accumulator is a write-only variable used to add values from executors and send the result back to the driver.
-
-Features
-
-Only add operations allowed.
-Useful for counters, sums, metrics.
-Driver can read the value.
-
----
-
-12. What is a Broadcast Variable in Spark?
-
-Answer: A broadcast variable is used to send a large read-only value to all executors efficiently.
-
-Features
-Cached on each executor.
-Saves network bandwidth.
-Reduces serialization cost.
-Ideal for lookup tables and configuration data.
-
----
-
-13. What is Shuffle in Spark?
-
-Answer: Shuffle is the process of moving data between executors for operations such as:
-groupByKey()
-join()
-reduceByKey()
-distinct()
-
-Shuffle Activities
-Data transfer
-Sorting
-Merging
-
-Optimization
-
-Proper partitioning
-Map-side aggregation
-
-
-
----
-
-14. What are Deployment Modes in Spark?
-
-  Mode	   |	Description	      |     Use Case
---------------------------------------------------
-  Local	   |    Single machine    |	Development & Testing
-Standalone | Spark cluster manager|	Small/Medium clusters
-YARN	   | Hadoop cluster       | Production
-Mesos	   | Apache Mesos	      | Shared clusters
-Kubernetes |Kubernetes platform	  | Cloud-native environments
-
-
----
-
-15. What is Spark SQL?
- Spark SQL is a module for structured data processing.
-
-Features
-DataFrame API
-SQL Interface
-Supports Datasets
-Catalyst Optimizer
-
-Integrates with Hive, Parquet, JSON, JDBC, etc.
----
-
-18. What is Spark Streaming?
-
-Answer: Spark Streaming is Spark's component for real-time stream processing.
-
-Features
-Processes data in micro-batches.
-High throughput.
-Fault tolerant.
-Reads from Kafka, Flume, Kinesis, etc.
-Uses DStreams.
-
------------------------------------
-
-Spark Interview Quick Revision
-
-RDD → Immutable distributed dataset.
-
-DataFrame → Schema-based tabular data.
-
-Spark SQL → Structured data processing.
-
-Lazy Evaluation → Execution starts only on Action.
-
-Accumulator → Write-only shared variable.
-
-Broadcast Variable → Read-only shared variable.
-
-Shuffle → Data movement between partitions.
-
-Catalyst Optimizer → Query optimization engine.
-
-Tungsten → Performance and memory optimization engine.
-
-Spark Streaming → Real-time data processing.
-
-MLlib → Machine learning library.
-
-Kubernetes → Cloud-native Spark deployment.
+================================================================================
+Q--> What is DRIVER Program?
+The Driver is the process where your main() program runs. It creates the SparkContext / SparkSession and controls how tasks are distributed across the cluster.
+Creates Spark Context
+Builds Execution Plan
+Schedules Tasks
+Communicates with Cluster Manager
+Collects Results
+
+
+Driver Program
+     |
+     |-----> Cluster Manager (allocates resources)
+     |
+Executors (run tasks on worker nodes)
+
+⚠️ Important Points
+
+The driver runs on a single node (can be local machine or cluster node)
+If the driver crashes → the entire Spark application fails
+
+Q. What are Executors in Spark?
+Executors are worker processes that run on cluster nodes and are responsible for executing tasks and storing data.
+ Key Responsibilities 
+1. Execute Tasks  -- Driver sends tasks → Executors run them in parallel
+2. Store Data  -- Hold cached data in memory (RDD/DataFrame caching)
+3. Return Results --  Send results back to the Driver
+
+
+Q. What is Resource Manager?
+The Resource Manager (also called Cluster Manager) is responsible for allocating resources (CPU, memory) to your Spark application.
+Key Responsibilities
+		Resource Allocation   -- 1. Decides how many executors you get    2. 	Allocates memory & cores
+		Launching Executors   --  Starts executor processes on worker nodes
+		Managing Cluster     --   Tracks resource usage  & 	Handles failures
+
+
+Simple Spark Execution Flow
+1.	User submits Spark application
+2.	Driver creates logical plan (DAG)
+3.	DAG is divided into stages
+4.	Each stage contains multiple tasks
+5.	Tasks are distributed to executors
+6.	Results are returned to the driver
+
+
+Q --> what is RePartition and Coalesce ?
+repartition() and coalesce() are used to change the number of partitions in a DataFrame/RDD—but they behave very differently.
+Repartition  --> repartition() is used to increase or decrease partitions and always performs a full shuffle.
+Key Characteristics
+
+✅ Can increase OR decrease partitions
+✅ Always triggers shuffle
+✅ Data is evenly distributed
+❗ Slower due to shuffle
+ex : df = df.repartition(10)    --> Spark redistributes data across 10 partitions evenly.
+
+Coalesce  --> coalesce() is used to reduce the number of partitions with minimal shuffle (or no shuffle)
+Key Characteristics
+
+✅ Only reduces partitions
+✅ Avoids shuffle (more efficient)
+❗ Data may be unevenly distributed
+✅ Faster than repartition
+ex: df = df.coalesce(2)   --> Spark merges partitions without full data movement.
+When to Use
+When you need balanced data distribution
+Before joins, aggregations
+To fix data skew
+
+When to Use
+Before writing output (like fewer files)
+When reducing partitions for performance optimization
+When you don’t care about perfect balance
