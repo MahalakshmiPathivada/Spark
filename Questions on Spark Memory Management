@@ -7,8 +7,8 @@ JVM Heap Memory
 |
 |-- Spark Memory     -- 60% of Memory  (unified Memory Management)
       |
-      |-- Execution Memory   50%      -used for Caching ( long term Memory)
-      | -- Storage Memory     50%      -- used for transformations (short term memory)
+      |-- Execution Memory   50%      -- used for transformations (short term memory)
+      | -- Storage Memory     50%      -used for Caching ( long term Memory)
 
 Executer memory can evict storage Memory  but storage memory does not evict executor memory
 
@@ -111,7 +111,7 @@ Think of Spark memory in two areas:
             1. On-Heap Memory  (Inside JVM Heap)
             2. Off-Heap Memory (Outside JVM Heap)
 
-On-Heap Memory -- By default Spark stores data inside JVM Heap.
+On-Heap Memory -- By default Spark stores data inside JVM Heap. (mainly we are using)
 
 JVM Heap
 |
@@ -175,8 +175,7 @@ Job failing because of
           OutOfMemoryError
 
 ==>What is Data Skew?
-Data skew occurs when some partitions contain significantly more data than others.
-All executors except one become idle. This is called Data Skew.
+Data skew in Spark occurs when data is unevenly distributed across partitions, causing some tasks to process significantly more data than others. This leads to straggler tasks, poor resource utilization, and longer job execution times. It commonly occurs during joins, aggregations, and shuffle operations
 
 ==> How to Identify Data Skew?
 if one task =30mints and remaing tasks 20 sec  (One task will be significantly larger.)
