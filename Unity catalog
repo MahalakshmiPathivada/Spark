@@ -1,0 +1,453 @@
+1.What is Unity Catalog and why was it introduced?
+
+Answer: Unity Catalog is Databricks' centralized governance solution that provides:
+Unified access control
+Data discovery
+Lineage
+Auditing
+Data sharing
+across all Databricks workspaces and clouds.
+
+Before Unity Catalog:
+Permissions were managed at workspace level.
+Metastore was workspace-specific.
+Governance was difficult across multiple workspaces.
+
+Unity Catalog creates a centralized governance layer.
+
+===========================================================
+
+2. Explain the Unity Catalog hierarchy.
+A:   
+  Metastore
+         └── Catalog        
+           └── Schema (Database)        
+             ├── Tables
+            
+             ├── Views
+            
+             ├── Volumes
+            
+             └── Functions
+
+===================================================
+3. What is the difference between Catalog and Schema?
+
+Catalog
+
+Top-level container
+Similar to business domain
+
+Examples:
+
+finance
+sales
+marketing
+
+Schema
+
+Logical grouping inside catalog
+
+Examples:
+finance.raw
+finance.silver
+========================================
+4. Managed Table vs External Table in Unity Catalog
+Managed Table
+          CREATE TABLE sales
+          (
+           id INT,
+           amount DOUBLE
+          )
+
+Data managed by Databricks
+Dropping table removes data
+
+External Table
+
+    CREATE TABLE sales_ext
+    USING DELTA
+    LOCATION 'abfss://sales@storage.dfs.core.windows.net/data';
+
+Data remains in storage even after table drop
+Databricks manages metadata only
+=======================================================================
+5. What are External Locations?
+
+External Location is a Unity Catalog object that links cloud storage to Databricks.
+
+      CREATE EXTERNAL LOCATION raw_data
+      URL 'abfss://raw@storageaccount.dfs.core.windows.net/'
+      WITH STORAGE CREDENTIAL my_credential;
+
+
+Benefits:
+    Secure access
+    Central governance
+    No storage keys in notebooks
+
+=======================================
+6. What are Storage Credentials?
+Storage Credentials define the authentication mechanism used to access cloud storage.
+
+Azure examples:
+    Managed Identity
+    Service Principal
+
+      CREATE STORAGE CREDENTIAL adls_cred
+      WITH AZURE_MANAGED_IDENTITY;
+=========================================
+7. Explain Volumes in Unity Catalog
+
+Expected Senior-Level Answer:
+
+Volumes govern non-tabular files.
+
+Examples:
+
+CSV files
+JSON files
+Images
+PDFs
+ML models
+Checkpoints
+
+Types:
+
+Managed Volume
+SQL
+CREATE VOLUME my_volume;
+
+Show more lines
+External Volume
+
+Volumes replace legacy DBFS mounts.
+
+8. Why should organizations move away from DBFS Mounts?
+
+Problems with mounts:
+          Workspace-specific
+          Limited governance
+          Access based on storage secrets
+          No centralized auditing
+
+Unity Catalog Volumes provide:
+          Fine-grained permissions
+          Audit logs
+          Consistent governance
+========================================================
+9. How does Unity Catalog handle security?
+
+Security layers:
+      Object Level
+      
+      GRANT SELECT ON TABLE customer TO analyst;
+
+Schema Level
+
+      GRANT USE SCHEMA ON SCHEMA finance.gold TO users;
+
+Catalog Level
+
+      GRANT USE CATALOG ON CATALOG finance TO users;
+
+=======================================================================
+10. Explain Row-Level Security.
+
+Example:  Employee should see only his region.
+
+SQL
+        CREATE ROW FILTER region_filter
+        AS (region = current_user_region());
+
+Benefits:
+Same table
+      Different users see different rows
+      11. Explain Column-Level Security.
+
+Sensitive columns:
+            salary
+            ssn
+            credit_card
+
+Restrict access:
+SQL
+      GRANT SELECT(name, department)
+      ON TABLE employees   TO analyst;
+
+============================================================
+12. What is Dynamic Data Masking?
+
+Example:
+Actual value:
+          9876543210
+
+Visible value:
+             XXXXXX3210
+
+Useful for:
+            PII
+            GDPR
+            HIPAA
+=====================================================================
+13. Explain Lineage in Unity Catalog.
+example"
+Lineage tracks:
+
+Source Table
+ ↓
+Silver Table
+ ↓
+Gold Table
+ ↓
+Dashboard
+
+
+Helps in:
+        Impact analysis
+        Compliance
+        Troubleshooting
+
+Question often asked:
+
+What happens if a source column changes?
+
+Use lineage to identify impacted pipelines and dashboards.
+=======================================================================
+14. How does Unity Catalog support auditing?
+
+Tracks:
+          Data access
+          Permission changes
+          Table creation
+          File access
+
+Helps with:
+        SOX
+        GDPR
+        HIPAA compliance
+===================================================================
+15. How would you design Unity Catalog for an enterprise?
+
+Example:
+
+Metastore
+
+sales_catalog
+
+ ├─ raw
+
+ ├─ silver
+
+ └─ gold
+
+
+
+finance_catalog
+
+ ├─ raw
+
+ ├─ silver
+
+ └─ gold
+
+
+
+marketing_catalog
+
+ ├─ raw
+
+ ├─ silver
+
+ └─ gold
+
+
+Domain-driven design.
+==============================================================
+16. Can multiple workspaces share a single metastore?
+
+Yes.
+Common enterprise architecture:
+            Dev Workspace
+             │
+            QA Workspace
+             │
+            Prod Workspace
+             │
+            Unity Catalog Metastore
+
+
+Benefits:
+      Consistent governance
+      Centralized permissions
+==============================================================================================
+17. What is Delta Sharing and its relation with Unity Catalog?
+
+Delta Sharing allows:
+      Secure data sharing
+      No data copies
+      Cross-cloud access
+
+Unity Catalog manages:
+        Shared tables
+        Permissions
+        Recipients
+==========================================================================================
+18. How do you migrate Hive Metastore to Unity Catalog?
+Typical Steps:
+        Assess current objects.
+        Create UC metastore.
+        Create catalogs and schemas.
+        Migrate tables.
+        Migrate permissions.
+        Validate data.
+        Enable UC-access mode clusters.
+        Retire Hive Metastore.
+======================================================================
+19. What challenges have you faced implementing Unity Catalog?
+Excellent real-world answer:
+
+        Legacy DBFS mounts migration
+        Storage credential setup
+        Access model redesign
+        Large-scale permission migration
+        Multi-workspace governance alignment
+        Existing ETL compatibility
+===============================================================================
+20. Scenario-Based Question
+Scenario:
+  Your organization has: 
+      5 Databricks workspaces
+      1000+ users
+      Finance and HR data
+      Regulatory requirements    How will you implement governance?
+Strong Answer:
+    Single Unity Catalog Metastore
+    Domain-based catalogs
+    Separate raw/silver/gold schemas
+    Managed identities
+    External locations
+    Row-level security
+    Column masking
+    Automated audit monitoring
+    Group-based permissions
+    Delta Sharing for external partners
+====================================================================
+Q: Why are Volumes needed in Unity Catalog?
+Volumes in Unity Catalog are used to manage and govern non-tabular data (files) within Databricks, while tables are used for structured data.
+
+Problem Before Volumes
+
+Before Unity Catalog Volumes, organizations stored files directly in ADLS Gen2, S3, or Blob Storage and accessed them using storage credentials or mount points. This created challenges:
+
+      Limited governance on files
+      Access control managed separately from Databricks
+      Difficult auditing and lineage tracking
+      Security risks from shared storage keys
+      Why Volumes Were Introduced
+
+Volumes provide a governed storage layer for files under Unity Catalog.
+
+They allow you to store and manage:
+
+CSV files
+JSON files
+Images
+PDFs
+ML models
+Configuration files
+Checkpoint files
+Any unstructured or semi-structured data
+Benefits of Volumes
+
+1. Centralized Governance
+
+Permissions are controlled through Unity Catalog.
+    GRANT READ FILES ON VOLUME sales_catalog.raw.sales_volume TO analyst_gr
+
+2. Auditability
+All file access activities are tracked through Unity Catalog audit logs.
+
+Example:
+      Who uploaded a file?
+      Who modified a file?
+      When was it accessed?
+
+3. Fine-Grained Security 
+You can grant:
+        READ FILES
+        WRITE FILES
+to specific users or groups.
+
+4.Better Alternative to DBFS Mounts
+
+Databricks recommends using Volumes instead of DBFS mounts because mounts are legacy and not governed by Unity Catalog.
+
+Types of Volumes
+  Managed Volume  -- Databricks manages the underlying storage location.
+              CREATE VOLUME customer_docs
+
+External Volume   --Points to an existing ADLS Gen2 container/folder.
+        
+CREATE EXTERNAL VOLUME sales_files
+LOCATION 'abfss://raw@storageaccount.dfs.core.windows.net/sales/';
+===============================================================================================
+
+Scenario
+
+Your company receives daily CSV files from external vendors into an ADLS Gen2 container.
+
+Without Unity Catalog, you might:
+
+Give users direct access to the storage account.
+Share Service Principal credentials or SAS tokens.
+Manage permissions at the storage layer.
+
+This creates:
+
+Security risks
+Credential management overhead
+Limited auditing
+Poor governance
+Solution Using Unity Catalog Volume
+Step 1: Create a Storage Credential
+
+Use a Managed Identity or Service Principal to access ADLS.
+
+Step 2: Create an External Location
+
+        CREATE EXTERNAL LOCATION vendor_ext_loc
+        URL 'abfss://vendor@companystorage.dfs.core.windows.net/'
+        WITH STORAGE CREDENTIAL vendor_cred
+
+Step 3: Create an External Volume
+
+    CREATE EXTERNAL VOLUME vendor_csv_volume
+    LOCATION 'abfss://vendor@companystorage.dfs.core.windows.net/dailyfiles/'
+
+Step 4: Grant Permissions
+
+        GRANT READ FILES
+        ON VOLUME vendor_csv_volume
+        TO data_analyst_team
+
+Step 5: Access Files
+
+          df = spark.read.csv(
+              "/Volumes/main/raw/vendor_csv_volume/customers.csv",
+              header=True
+          )
+
+=================================================================================================
+Why is Unity Catalog considered a game changer compared to Hive Metastore?
+
+Hive Metastore               |    	Unity Catalog
+========================================================
+Workspace level	             |   Account level
+Basic permissions            |	Fine-grained security
+No lineage	                 |  Built-in lineage
+Limited auditing             |	Centralized auditing
+No row filtering             |	Row-level security
+No column masking	Dynamic masking
+No volumes	Governed volumes
+Weak multi-workspace governance	Enterprise governance
